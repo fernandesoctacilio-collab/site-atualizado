@@ -1,4 +1,651 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
-<!-- Conteúdo omitido para fins de brevidade, pois já está incluso no HTML completo enviado -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal da Transparência Cidadã - Natividade da Serra</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom styles for the unified portal */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1D3557 0%, #457B9D 100%);
+            min-height: 100vh;
+            color: #1a202c;
+            scroll-behavior: smooth;
+        }
+
+
+        /* Glass morphism effect */
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+        }
+
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+
+        /* Navigation styling */
+        .nav-tab {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .nav-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .nav-tab.active {
+            background: linear-gradient(135deg, #e63946, #f4a261);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(230, 57, 70, 0.4);
+            color: white;
+            font-weight: 600;
+        }
+
+
+        /* Content section animation */
+        .content-section { display: none; animation: slideInUp 0.6s ease-out; }
+        .content-section.active { display: block; }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+
+        /* Metric/KPI card styling */
+        .metric-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -2px; }
+
+
+        /* Gradient text utility */
+        .gradient-text {
+            background: linear-gradient(135deg, #1D3557 0%, #457B9D 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .gradient-text-danger {
+             background: linear-gradient(135deg, #e63946, #f4a261);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+
+        /* Timeline from Raio-X, adapted */
+        .timeline-item { position: relative; padding-left: 2.5rem; padding-bottom: 2rem; border-left: 2px solid #e0e0e0; }
+        .timeline-item:last-child { border-left: 2px solid transparent; padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: -0.5rem; top: 0.25rem; height: 1rem; width: 1rem; border-radius: 9999px; border: 3px solid #f1f5f9; }
+        
+        /* Accordion from Raio-X, adapted */
+        .accordion-button { transition: background-color 0.2s; }
+        .accordion-button::after { content: "\\25BC"; float: right; transform: scale(0.8); transition: transform 0.2s; }
+        .accordion-button.open::after { transform: scale(0.8) rotate(180deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        
+        /* Document Link from Raio-X, adapted */
+        .document-link { display: inline-flex; align-items: center; padding: 0.5rem 1rem; background-color: #f0f7ff; border: 1px solid #d1e7ff; border-radius: 6px; color: #1D3557; text-decoration: none; transition: 0.2s; margin: 0.25rem; font-weight: 500; }
+        .document-link:hover { background-color: #e1efff; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .document-link i { margin-right: 0.5rem; }
+
+
+        /* Alert Card Styles from original budget analysis */
+        .alert-card { border-radius: 16px; padding: 1.5rem; border-left-width: 6px; transition: all 0.3s ease; margin-bottom: 1rem; }
+        .alert-card:hover { transform: translateX(8px); }
+        .alert-success { border-left-color: #10b981; background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #047857; }
+        .alert-warning { border-left-color: #f59e0b; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #b45309; }
+        .alert-danger { border-left-color: #ef4444; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #b91c1c; }
+    </style>
+</head>
+<body class="antialiased">
+
+
+    <!-- Hero Header -->
+    <header class="relative h-[70vh] flex items-center justify-center overflow-hidden text-white">
+        <div class="absolute inset-0 bg-black opacity-20"></div>
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <div>
+                <h1 class="text-5xl lg:text-7xl font-bold mb-4 leading-tight">Transparência Cidadã</h1>
+                <p class="text-3xl lg:text-4xl text-gray-200 mb-8 max-w-3xl mx-auto font-light">
+                    Análise do Orçamento e dos Alertas do TCE para <span class="font-semibold text-yellow-300">Natividade da Serra</span>
+                </p>
+                <button class="bg-white text-[#1D3557] px-8 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105" onclick="document.getElementById('main-content').scrollIntoView()">
+                    Explorar Análise <i class="fas fa-arrow-down ml-2"></i>
+                </button>
+            </div>
+        </header>
+
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-gradient-to-r from-[#1D3557] via-[#457B9D] to-[#1D3557] shadow-lg">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex flex-wrap justify-center gap-2 lg:gap-3">
+                <button class="nav-tab px-4 py-2 text-sm lg:text-base font-medium active" data-target="visao-geral">📊 Visão Geral</button>
+                <button class="nav-tab px-4 py-2 text-sm lg:text-base font-medium" data-target="analise-orcamentaria">💰 Análise Orçamentária</button>
+                <button class="nav-tab px-4 py-2 text-sm lg:text-base font-medium" data-target="alertas-tce">🚨 Alertas do TCE</button>
+                <button class="nav-tab px-4 py-2 text-sm lg:text-base font-medium" data-target="documentos">📂 Documentos</button>
+                <button class="nav-tab px-4 py-2 text-sm lg:text-base font-medium" data-target="carta-cidadao">📝 Carta ao Cidadão</button>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="container mx-auto px-6 py-12 bg-gray-100">
+        <!-- Unified Overview Section -->
+        <section class="content-section active" id="visao-geral">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl lg:text-5xl font-bold gradient-text mb-4">Diagnóstico Completo</h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">Indicadores chave do orçamento e os principais alertas do Tribunal de Contas (TCE-SP).</p>
+            </div>
+            <!-- Key Metrics from Budget -->
+            <h3 class="text-2xl font-bold gradient-text mb-6 text-center">Panorama Orçamentário</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                <div class="metric-card"><div class="text-4xl mb-2">💰</div><h4 class="text-lg font-semibold text-gray-600 mb-1">Orçamento 2025</h4><p class="text-3xl font-bold gradient-text">R$ 49,9 mi</p><p class="text-sm text-green-600 mt-1 font-medium">+69,6% vs 2021</p></div>
+                <div class="metric-card"><div class="text-4xl mb-2">👥</div><h4 class="text-lg font-semibold text-gray-600 mb-1">População</h4><p class="text-3xl font-bold gradient-text">6.690</p><p class="text-sm text-gray-500 mt-1">habitantes</p></div>
+                <div class="metric-card"><div class="text-4xl mb-2">📈</div><h4 class="text-lg font-semibold text-gray-600 mb-1">Orçamento Per Capita</h4><p class="text-3xl font-bold gradient-text">R$ 7.463</p><p class="text-sm text-gray-500 mt-1">por habitante/ano</p></div>
+                <div class="metric-card"><div class="text-4xl mb-2">🎯</div><h4 class="text-lg font-semibold text-gray-600 mb-1">Dependência Externa</h4><p class="text-3xl font-bold text-red-500">~90%</p><p class="text-sm text-red-500 mt-1">de transferências</p></div>
+            </div>
+            <!-- Key Alerts from TCE -->
+            <h3 class="text-2xl font-bold gradient-text-danger mb-6 text-center">Principais Alertas do TCE-SP</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+               <div class="kpi-card text-center border-t-4 border-red-500"><h4 class="text-lg font-semibold text-gray-500 mb-2">Gastos vs. Arrecadação</h4><p class="text-4xl font-bold text-red-600">Crítico</p><p class="text-sm text-gray-500 mt-2">Violação recorrente do limite de 95% para despesas (Art. 167-A da CF).</p></div>
+               <div class="kpi-card text-center border-t-4 border-yellow-500"><h4 class="text-lg font-semibold text-gray-500 mb-2">Investimento em Educação</h4><p class="text-4xl font-bold text-yellow-600">Em Alerta</p><p class="text-sm text-gray-500 mt-2">Alertas por não aplicar o mínimo exigido pela lei na educação.</p></div>
+               <div class="kpi-card text-center border-t-4 border-orange-500"><h4 class="text-lg font-semibold text-gray-500 mb-2">Risco de Liquidez</h4><p class="text-4xl font-bold text-orange-600">Alto Risco</p><p class="text-sm text-gray-500 mt-2">Risco de não ter caixa para pagar as contas do dia a dia (Alerta GF37).</p></div>
+            </div>
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="glass-card p-6"><h3 class="text-xl font-bold text-center mb-4 gradient-text">Evolução Orçamentária (2021-2025)</h3><div class="h-80"><canvas id="evolutionChart"></canvas></div></div>
+                <div class="glass-card p-6"><h3 class="text-xl font-bold text-center mb-4 gradient-text-danger">Alerta Crítico: Despesa vs. Receita</h3><div id="tce-chart-info" class="text-center mb-2 p-2 bg-gray-100 rounded-lg min-h-[60px] flex items-center justify-center"><p class="text-gray-600 text-sm">Passe o mouse sobre um ponto para detalhes.</p></div><div class="h-64"><canvas id="tceAlertChart"></canvas></div></div>
+            </div>
+        </section>
+
+
+        <!-- Budget Analysis Section -->
+        <section class="content-section" id="analise-orcamentaria">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl lg:text-5xl font-bold gradient-text mb-4">Análise Detalhada do Orçamento</h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">A jornada orçamentária de Natividade da Serra, os mecanismos de suplementação e o parecer técnico sobre a gestão fiscal.</p>
+            </div>
+            <div class="space-y-12">
+                <!-- Linha do Tempo Orçamentária -->
+                <div class="glass-card p-8">
+                    <h3 class="text-3xl font-bold mb-8 gradient-text text-center">Linha do Tempo Orçamentária</h3>
+                    <div class="space-y-12">
+                        <!-- 2021 -->
+                        <div class="p-6 rounded-lg border-l-4 border-blue-300 bg-blue-50/50">
+                            <div class="flex items-center mb-4 flex-wrap">
+                                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl mr-6 mb-4 lg:mb-0">2021</div>
+                                <h4 class="text-3xl font-bold gradient-text">Ano Base - Gestão Conservadora</h4>
+                            </div>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div>
+                                    <h5 class="text-xl font-semibold mb-4 text-gray-700">Indicadores Principais</h5>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Orçamento Total</span><span class="font-bold text-blue-600">R$ 29,4 milhões</span></div>
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Maior Investimento</span><span class="font-bold text-green-600">Educação (32,8%)</span></div>
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Meta de Superávit</span><span class="font-bold text-purple-600">R$ 730 mil</span></div>
+                                    </div>
+                                </div>
+                                <div class="alert-card alert-success"><h5 class="font-bold text-xl mb-3">📊 Diagnóstico</h5><p class="leading-relaxed">Orçamento equilibrado e conservador, com foco nas áreas constitucionais. Demonstrou disciplina fiscal com meta de resultado primário positivo.</p></div>
+                            </div>
+                        </div>
+                        <!-- 2022 -->
+                        <div class="p-6 rounded-lg border-l-4 border-yellow-400 bg-yellow-50/50">
+                            <div class="flex items-center mb-4 flex-wrap">
+                                <div class="w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl mr-6 mb-4 lg:mb-0">2022</div>
+                                <h4 class="text-3xl font-bold gradient-text">Estagnação e Primeira Falha</h4>
+                            </div>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div>
+                                    <h5 class="text-xl font-semibold mb-4 text-gray-700">Indicadores Principais</h5>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Orçamento Total</span><span class="font-bold text-blue-600">R$ 29,6 milhões</span></div>
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Crescimento</span><span class="font-bold text-yellow-600">+0,8% (mínimo)</span></div>
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Erro de Projeção</span><span class="font-bold text-red-600">R$ 2,1 milhões</span></div>
+                                    </div>
+                                </div>
+                                <div class="alert-card alert-warning"><h5 class="font-bold text-xl mb-3">⚠️ Falha Crítica</h5><p class="leading-relaxed"><strong>Erro de R$ 2,1 milhões na previsão.</strong> A LDO 2021 estimou R$ 31,7 mi, mas o real foi R$ 29,6 mi. Discrepância de 7% revela fragilidade no planejamento.</p></div>
+                            </div>
+                        </div>
+                        <!-- 2023 -->
+                        <div class="p-6 rounded-lg border-l-4 border-green-300 bg-green-50/50">
+                             <div class="flex items-center mb-4 flex-wrap"><div class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-xl mr-6 mb-4 lg:mb-0">2023</div><h4 class="text-3xl font-bold gradient-text">Expansão e Inconsistências</h4></div>
+                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div>
+                                    <h5 class="text-xl font-semibold mb-4 text-gray-700">Indicadores Principais</h5>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Orçamento Total</span><span class="font-bold text-blue-600">R$ 34,4 milhões</span></div>
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Crescimento</span><span class="font-bold text-green-600">+16,1% vs 2022</span></div>
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Dívida Registrada</span><span class="font-bold text-red-600">R$ 5,3 milhões</span></div>
+                                    </div>
+                                </div>
+                                <div class="alert-card alert-warning"><h5 class="font-bold text-xl mb-3">🔄 Mudança Metodológica</h5><p class="leading-relaxed">Primeira menção à "Dívida Fundada". Em 2024 mudou para "Dívida Consolidada Líquida" sem explicação técnica, prejudicando a comparabilidade temporal.</p></div>
+                             </div>
+                        </div>
+                        <!-- 2024 -->
+                        <div class="p-6 rounded-lg border-l-4 border-red-300 bg-red-50/50">
+                            <div class="flex items-center mb-4 flex-wrap"><div class="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl mr-6 pulse-dot mb-4 lg:mb-0">2024</div><h4 class="text-3xl font-bold gradient-text">Crescimento Descontrolado</h4></div>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                <div>
+                                    <h5 class="text-xl font-semibold mb-4 text-gray-700">Indicadores Principais</h5>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Orçamento Total</span><span class="font-bold text-blue-600">R$ 42,6 milhões</span></div>
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Crescimento</span><span class="font-bold text-red-600">+23,8% vs 2023</span></div>
+                                        <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg"><span class="font-medium">Meta de Superávit</span><span class="font-bold text-red-600">R$ 1,0 milhão (↓)</span></div>
+                                    </div>
+                                </div>
+                                <div class="alert-card alert-success"><h5 class="font-bold text-xl mb-3">👥 Participação Popular</h5><p class="leading-relaxed">A consulta pública resultou em aumento de quase 30% nos investimentos em Educação. Demonstração concreta do poder da participação cidadã.</p></div>
+                            </div>
+                            <div class="alert-card alert-danger"><h5 class="font-bold text-xl mb-3">🚨 ALERTA CRÍTICO</h5><div class="bg-white bg-opacity-70 p-4 rounded-lg mt-4"><p class="font-medium mb-3">Deterioração da Capacidade Fiscal:</p><ul class="space-y-2 list-disc list-inside"><li><strong>Receita aumentou R$ 8,2 milhões</strong></li><li><strong>Meta de economia diminuiu</strong></li><li><strong>Gastos cresceram mais que a arrecadação</strong></li><li><strong>Política fiscal insustentável no médio prazo</strong></li></ul></div></div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Suplementações -->
+                <div class="glass-card p-8">
+                    <h3 class="text-3xl font-bold mb-8 text-orange-600 text-center">O Risco das Suplementações</h3>
+                    <div class="space-y-8">
+                        <div>
+                            <h4 class="text-2xl font-bold mb-4 text-blue-800">🔧 Definição Técnica</h4>
+                            <p class="text-lg leading-relaxed text-gray-700 mb-6">Suplementação orçamentária é um instrumento legal que permite<strong> redistribuir recursos</strong> entre diferentes áreas do orçamento após sua aprovação. Funciona como uma "transferência interna" onde se reduz a dotação de uma área para aumentar a de outra.</p>
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div class="bg-green-50 p-6 rounded-xl border border-green-200"><h5 class="font-bold text-green-800 mb-4 text-lg">✅ Usos Legítimos</h5><ul class="space-y-2 text-green-700 list-disc list-inside"><li>Emergências naturais (enchentes, secas)</li><li>Demandas judiciais obrigatórias</li><li>Oportunidades imprevistas de investimento</li><li>Ajustes técnicos menores</li></ul></div>
+                                <div class="bg-red-50 p-6 rounded-xl border border-red-200"><h5 class="font-bold text-red-800 mb-4 text-lg">❌ Usos Problemáticos</h5><ul class="space-y-2 text-red-700 list-disc list-inside"><li>Compensar falhas de planejamento</li><li>Mudanças frequentes de prioridades</li><li>Projetos eleitoreiros de última hora</li><li>Desvio de recursos sem justificativa</li></ul></div>
+                            </div>
+                        </div>
+                        <div class="bg-red-50 p-6 rounded-xl border-l-4 border-red-400">
+                            <h4 class="text-2xl font-bold mb-4 text-red-700">🚨 Riscos do Uso Indiscriminado</h4>
+                            <ul class="space-y-4 text-red-700 list-disc list-inside">
+                                <li><strong>Esvaziamento da Participação Popular:</strong> Quando suplementações se tornam rotina, o orçamento aprovado vira ficção. As prioridades do cidadão podem ser alteradas por decisões unilaterais.</li>
+                                <li><strong>Indicador de Má Gestão:</strong> Suplementações excessivas revelam incompetência no planejamento. Uma gestão competente deve conseguir estimar suas necessidades anuais com precisão.</li>
+                                <li><strong>Quebra da Confiança Institucional:</strong> Obras prometidas podem perder recursos para projetos de impacto eleitoral, gerando insegurança sobre compromissos públicos.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Parecer Técnico -->
+                <div class="glass-card p-8 border-4 border-red-200">
+                    <h3 class="text-3xl font-bold mb-8 text-red-700 text-center">Parecer Técnico Final</h3>
+                    <div class="bg-red-50 p-6 rounded-lg border-l-4 border-red-500 mb-6">
+                        <p class="text-lg leading-relaxed"><strong>A gestão orçamentária de Natividade da Serra apresenta sinais preocupantes de insustentabilidade fiscal.</strong> Embora demonstre capacidade de mobilização de recursos, <strong>falha em aspectos fundamentais de planejamento e disciplina fiscal.</strong></p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-blue-50 p-6 rounded-xl"><h4 class="font-bold text-blue-700 mb-4 text-lg">📈 Indicadores Positivos</h4><ul class="space-y-2 text-blue-600 list-disc list-inside"><li>Crescimento orçamentário robusto</li><li>Priorização das áreas sociais obrigatórias</li><li>Participação popular com impacto real em 2024</li><li>Atendimento aos percentuais constitucionais</li></ul></div>
+                        <div class="bg-red-50 p-6 rounded-xl"><h4 class="font-bold text-red-700 mb-4 text-lg">⚠️ Riscos Identificados</h4><ul class="space-y-2 text-red-600 list-disc list-inside"><li>Dependência extrema de transferências (&gt;90%)</li><li>Deterioração da capacidade de poupança</li><li>Inconsistências metodológicas nos relatórios</li><li>Falhas recorrentes nas projeções</li></ul></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- TCE Alerts Section -->
+        <section class="content-section" id="alertas-tce">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl lg:text-5xl font-bold gradient-text-danger mb-4">Raio-X dos Alertas do TCE-SP</h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">Explore a linha do tempo dos alertas e entenda o que cada um significa para o município.</p>
+            </div>
+            <div class="glass-card p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                    <!-- Coluna da Linha do Tempo -->
+                    <div>
+                        <h3 class="text-2xl font-bold text-center text-[#1D3557] mb-6">Linha do Tempo dos Alertas</h3>
+                        <div id="timeline-filters" class="flex flex-wrap justify-center gap-2 mb-8">
+                           <button data-filter="all" class="filter-btn bg-[#1D3557] text-white px-4 py-2 rounded-full text-sm">Todos</button>
+                           <button data-filter="fiscal" class="filter-btn bg-white text-gray-700 px-4 py-2 rounded-full border text-sm">Fiscal</button>
+                           <button data-filter="educacao" class="filter-btn bg-white text-gray-700 px-4 py-2 rounded-full border text-sm">Educação</button>
+                           <button data-filter="admin" class="filter-btn bg-white text-gray-700 px-4 py-2 rounded-full border text-sm">Administrativo</button>
+                        </div>
+                        <div id="timeline-container" class="max-h-[600px] overflow-y-auto pr-4 bg-slate-50 p-4 rounded-lg"></div>
+                    </div>
+                    <!-- Coluna do Glossário -->
+                    <div>
+                        <h3 class="text-2xl font-bold text-center text-[#1D3557] mb-6">Descomplicando o "Contabilês"</h3>
+                        <div id="accordion-container" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Documents Section -->
+        <section class="content-section" id="documentos">
+             <div class="text-center mb-12"><h2 class="text-4xl lg:text-5xl font-bold gradient-text mb-4">Documentos Oficiais</h2><p class="text-xl text-gray-600 max-w-4xl mx-auto">Acesse as fontes primárias desta análise para verificação e aprofundamento.</p></div>
+             <div class="glass-card p-8">
+               <h3 class="text-2xl font-bold text-[#1D3557] mb-6 flex items-center"><i class="fas fa-file-contract mr-3 text-[#1D3557]"></i>Relatórios de Alerta do TCE-SP</h3>
+               <p class="text-gray-600 mb-6">Os documentos do Tribunal de Contas do Estado de São Paulo (TCE-SP) são a base para a seção "Alertas".</p>
+               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                   <a href="https://transparencia.tce.sp.gov.br/municipio/natividade-da-serra/2025/relatorio-alerta" target="_blank" class="document-link justify-center"><i class="fas fa-external-link-alt"></i> Alertas 2025</a>
+                   <a href="https://transparencia.tce.sp.gov.br/municipio/natividade-da-serra/2024/relatorio-alerta" target="_blank" class="document-link justify-center"><i class="fas fa-external-link-alt"></i> Alertas 2024</a>
+                   <a href="https://transparencia.tce.sp.gov.br/municipio/natividade-da-serra/2023/relatorio-alerta" target="_blank" class="document-link justify-center"><i class="fas fa-external-link-alt"></i> Alertas 2023</a>
+               </div>
+               <h3 class="text-2xl font-bold text-[#1D3557] mb-6 flex items-center"><i class="fas fa-file-invoice-dollar mr-3 text-[#1D3557]"></i>Leis Orçamentárias</h3>
+               <p class="text-gray-600 mb-6">A análise orçamentária é baseada nas Leis de Diretrizes Orçamentárias (LDOs) e Leis Orçamentárias Anuais (LOAs), que podem ser consultadas no portal da transparência do município.</p>
+            </div>
+        </section>
+
+
+        <!-- Citizen Letter Section -->
+        <section class="content-section" id="carta-cidadao">
+            <div class="max-w-4xl mx-auto glass-card p-8 prose lg:prose-lg">
+                <h3 class="text-center text-2xl font-bold">🟠 Uma Reflexão Necessária para Natividade da Serra</h3>
+                
+                <h4 class="font-bold">1. O que dizem os Alertas do TCE</h4>
+                <p>Desde 2023, o Tribunal de Contas do Estado (TCE-SP) vem emitindo alertas recorrentes:</p>
+                <ul class="list-disc pl-5">
+                    <li>A prefeitura está gastando mais do que arrecada para manter os serviços básicos.</li>
+                    <li>Isso é especialmente grave em um município como o nosso, que sobrevive quase exclusivamente de repasses estaduais e federais.</li>
+                </ul>
+                <p>Mesmo assim:</p>
+                <ul class="list-disc pl-5">
+                    <li>A Festa do Peão ultrapassa R$ 1 milhão por ano em gastos;</li>
+                    <li>A Educação recebe abaixo do mínimo exigido por lei;</li>
+                    <li>Há risco real de não haver recursos suficientes para despesas essenciais;</li>
+                    <li>E em 2025, em vez de cortes, houve aumento no número de cargos comissionados.</li>
+                </ul>
+                <p>🔎 Essas escolhas colocam em xeque nossas prioridades.</p>
+                
+                <h4 class="font-bold">2. O que revela a Análise da LDO</h4>
+                <p>O orçamento de Natividade da Serra cresceu quase 70% em quatro anos.</p>
+                <p>Mas esse crescimento não reflete prosperidade local:</p>
+                <ul class="list-disc pl-5">
+                   <li>Mais de 90% dos recursos vêm de fora.</li>
+                </ul>
+                <p>📉 Somos um município altamente dependente.</p>
+                <p>Outro ponto crítico: o uso excessivo de suplementações orçamentárias — mudanças feitas pelo prefeito no destino do dinheiro após a aprovação do orçamento pela Câmara. Essa prática:</p>
+                <ul class="list-disc pl-5">
+                    <li>Descaracteriza as audiências públicas;</li>
+                    <li>Enfraquece a participação popular;</li>
+                    <li>E compromete a transparência sobre como e onde o dinheiro público está sendo aplicado.</li>
+                </ul>
+                
+                <h4 class="font-bold">📍 Conclusão: Entre a intenção e a realidade</h4>
+                <p>É justo reconhecer:</p>
+                <ul class="list-disc pl-5">
+                    <li>O prefeito pode, sim, ter boas intenções.</li>
+                </ul>
+                <p>Desejar mais estrutura, lazer e desenvolvimento para Natividade da Serra é legítimo — e muitas vezes bem-vindo. Contudo,</p>
+                <ul class="list-disc pl-5">
+                    <li>A jornada é tão importante quanto o destino.</li>
+                </ul>
+                <p>Boas intenções não bastam, quando as escolhas orçamentárias sacrificam o básico em nome do que é mais visível ou popular.</p>
+                <p>🎪 Gastar com festas e 📋 ampliar cargos comissionados podem agradar no curto prazo — mas não resolvem os problemas estruturais da cidade.</p>
+                <p>O verdadeiro progresso exige:</p>
+                <ul class="list-disc pl-5">
+                    <li>Coragem para tomar decisões difíceis;</li>
+                    <li>Compromisso com saúde, educação e infraestrutura;</li>
+                    <li>Prioridade aos interesses coletivos, não políticos.</li>
+                </ul>
+                <p>✊ Cabe a nós, cidadãos, acompanhar, questionar e participar. Porque a cidade do futuro não se constrói apenas com shows e promessas — mas com gestão responsável, ética e coerente com a realidade de quem mais precisa.</p>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white">
+        <div class="container mx-auto py-8 px-6 text-center text-gray-400 text-sm">
+           <p>Análise baseada em dados públicos das Leis de Diretrizes Orçamentárias (LDOs) e Notificações de Alerta do Tribunal de Contas do Estado de São Paulo (TCE-SP).</p>
+           <p>Este é um projeto de visualização de dados para fins informativos e de fomento ao controle social.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATA FOR CHARTS AND CONTENT ---
+            const tceAlertsData = [
+                { date: '01/2023', code: 'CI01', desc: 'Entrega de balancetes fora do prazo.', cat: 'admin' },
+                { date: '01/2023', code: 'GF15', desc: 'Tendência de não cumprir as Metas Fiscais.', cat: 'fiscal' },
+                { date: '01/2023', code: 'AE03', desc: 'Aplicação em ensino abaixo do mínimo constitucional.', cat: 'educacao' },
+                { date: '01/2023', code: 'AE05', desc: 'Aplicação de recursos do FUNDEB abaixo do legal.', cat: 'educacao' },
+                { date: '01/2023', code: 'AE06', desc: 'Aplicação do FUNDEB para pagar professores abaixo do mínimo.', cat: 'educacao' },
+                { date: '02/2023', code: 'GF56', desc: 'Gastos atingem 88,24% da receita, superando o limite de alerta.', cat: 'fiscal' },
+                { date: '06/2023', code: 'GF16', desc: 'Ocorrência de déficit: município gastou mais do que a meta de arrecadação.', cat: 'fiscal' },
+                { date: '06/2023', code: 'GF56', desc: 'Gastos atingem 95,94% da receita, VIOLANDO o teto constitucional de 95%.', cat: 'fiscal' },
+                { date: '08/2023', code: 'GF27', desc: 'Despesa com pessoal ultrapassou o limite da Lei de Responsabilidade Fiscal.', cat: 'fiscal' },
+                { date: '08/2023', code: 'GF56', desc: 'Gastos atingem 99,91% da receita, mantendo a violação do teto.', cat: 'fiscal' },
+                { date: '10/2023', code: 'GF56', desc: 'PONTO CRÍTICO: Gastos atingem 100,72%, superando a arrecadação.', cat: 'fiscal' },
+                { date: '02/2024', code: 'GF56', desc: 'Gastos atingem 94,48% da receita, muito próximo do teto.', cat: 'fiscal' },
+                { date: '06/2024', code: 'GF37', desc: 'ALERTA GRAVE: Risco de não ter dinheiro em caixa para pagar as contas.', cat: 'fiscal' },
+                { date: '11/2024', code: 'GF37', desc: '(Recorrente) Risco de não ter dinheiro em caixa para pagar as contas.', cat: 'fiscal' },
+                { date: '01/2025', code: 'CI01', desc: '(Recorrente) Entrega de balancetes fora do prazo.', cat: 'admin' },
+                { date: '02/2025', code: 'GF56', desc: 'Gastos atingem 93,29% da receita, novamente próximo ao teto.', cat: 'fiscal' },
+                { date: '06/2025', code: 'GF56', desc: 'Gastos atingem 94,29%, mais uma vez próximo ao teto constitucional.', cat: 'fiscal' },
+            ];
+
+
+            const accordionData = [
+                { code: 'CI01', title: 'Falha Administrativa', content: 'A prefeitura atrasou ou não entregou documentos contábeis obrigatórios ao TCE. Isso dificulta a fiscalização e é sinal de desorganização interna.' },
+                { code: 'GF56', title: 'Teto de Gastos Violado', content: 'O alerta mais crítico (Art. 167-A da CF). Mostra que a despesa corrente superou 95% da receita. Isso "engessa" a prefeitura, proibindo aumentos e contratações, e sinaliza descontrole total.' },
+                { code: 'GF37', title: 'Risco de "Apagão" Financeiro', content: 'Alerta gravíssimo (Art. 42 da LRF). Indica que a prefeitura pode não ter dinheiro em caixa para pagar as despesas já contratadas, correndo o risco de deixar contas para o próximo gestor, o que é ilegal.' },
+                { code: 'AE03/05/06', title: 'Cortes na Educação', content: 'A prefeitura não aplicou o mínimo exigido por lei na Educação, seja com recursos próprios ou do FUNDEB. Isso impacta diretamente a qualidade do ensino e a infraestrutura das escolas.' },
+                { code: 'GF15/16/20', title: 'Déficit e Falha de Planejamento', content: 'A prefeitura gastou mais do que arrecadou ou não conseguiu atingir suas metas. É o primeiro sinal de que as contas podem não fechar.' },
+            ];
+
+
+
+
+            // --- ELEMENTS ---
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const sections = document.querySelectorAll('.content-section');
+            
+            // --- NAVIGATION LOGIC ---
+            function showSection(targetId) {
+                sections.forEach(section => section.classList.remove('active'));
+                navTabs.forEach(tab => tab.classList.remove('active'));
+                
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) targetSection.classList.add('active');
+                
+                const activeTab = document.querySelector(`.nav-tab[data-target="${targetId}"]`);
+                if (activeTab) activeTab.classList.add('active');
+            }
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showSection(tab.getAttribute('data-target'));
+                });
+            });
+
+
+            // --- BUDGET EVOLUTION CHART ---
+            const evolutionChartCanvas = document.getElementById('evolutionChart');
+            if (evolutionChartCanvas) {
+                new Chart(evolutionChartCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['2021', '2022', '2023', '2024', '2025'],
+                        datasets: [{
+                            label: 'Orçamento Total',
+                            data: [29.4, 29.6, 34.4, 42.6, 49.9],
+                            backgroundColor: 'rgba(29, 53, 87, 0.1)',
+                            borderColor: '#1D3557',
+                            borderWidth: 3, fill: true, tension: 0.4,
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `R$ ${ctx.raw} Milhões` } } },
+                        scales: { y: { ticks: { callback: val => `R$ ${val}M` } } }
+                    }
+                });
+            }
+
+
+            // --- TCE ALERT CHART (GF56) ---
+            const tceAlertChartCanvas = document.getElementById('tceAlertChart');
+            const tceChartInfo = document.getElementById('tce-chart-info');
+            if (tceAlertChartCanvas) {
+                const gf56Data = {
+                    labels: ['Fev/23', 'Jun/23', 'Ago/23', 'Out/23', 'Fev/24', 'Fev/25', 'Jun/25'],
+                    values: [88.24, 95.94, 99.91, 100.72, 94.48, 93.29, 94.29]
+                };
+                new Chart(tceAlertChartCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: gf56Data.labels,
+                        datasets: [{
+                            label: '% Gasto/Receita',
+                            data: gf56Data.values,
+                            borderColor: '#e63946',
+                            backgroundColor: 'rgba(230, 57, 70, 0.1)',
+                            borderWidth: 3, fill: true, tension: 0.3,
+                        }, {
+                            type: 'line',
+                            label: 'Limite Constitucional (95%)',
+                            data: Array(gf56Data.labels.length).fill(95),
+                            borderColor: '#f4a261',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: false, ticks: { callback: val => `${val}%` } } },
+                        onHover: (event, chartElement) => {
+                            if (chartElement.length > 0) {
+                                const index = chartElement[0].index;
+                                const dataPoint = gf56Data.values[index];
+                                const label = gf56Data.labels[index];
+                                let status = dataPoint > 95 ? 'VIOLADO' : (dataPoint > 90 ? 'ALERTA' : 'OK');
+                                let color = dataPoint > 95 ? 'text-red-600' : (dataPoint > 90 ? 'text-orange-600' : 'text-green-600');
+                                tceChartInfo.innerHTML = `<p class="font-semibold">${label}: <span class="font-bold text-xl">${dataPoint}%</span> <span class="${color} font-bold">(${status})</span></p>`;
+                            } else {
+                                tceChartInfo.innerHTML = `<p class="text-gray-600 text-sm">Passe o mouse sobre um ponto para detalhes.</p>`;
+                            }
+                        }
+                    }
+                });
+            }
+
+
+            // --- TIMELINE LOGIC ---
+            const timelineContainer = document.getElementById('timeline-container');
+            const filterButtons = document.querySelectorAll('#timeline-filters .filter-btn');
+            
+            function renderTimeline(filter = 'all') {
+                if (!timelineContainer) return;
+                timelineContainer.innerHTML = '';
+                const filteredData = filter === 'all' ? tceAlertsData : tceAlertsData.filter(item => item.cat === filter);
+                
+                let dotColor = '';
+                filteredData.forEach(item => {
+                    switch(item.cat) {
+                        case 'fiscal': dotColor = 'bg-red-500'; break;
+                        case 'educacao': dotColor = 'bg-yellow-500'; break;
+                        case 'admin': dotColor = 'bg-blue-500'; break;
+                        default: dotColor = 'bg-gray-500';
+                    }
+                    timelineContainer.innerHTML += `
+                        <div class="timeline-item">
+                           <div class="timeline-dot ${dotColor}"></div>
+                           <p class="font-bold text-lg text-[#1D3557]">${item.date}</p>
+                           <div class="flex items-start space-x-2 mt-1">
+                               <span class="font-mono text-sm bg-gray-200 text-gray-800 px-2 py-1 rounded">${item.code}</span>
+                               <p class="text-gray-700">${item.desc}</p>
+                           </div>
+                       </div>`;
+                });
+            }
+
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('bg-[#1D3557]', 'text-white');
+                        btn.classList.add('bg-white', 'text-gray-700');
+                    });
+                    button.classList.add('bg-[#1D3557]', 'text-white');
+                    button.classList.remove('bg-white', 'text-gray-700');
+                    renderTimeline(button.dataset.filter);
+                });
+            });
+
+
+            // --- ACCORDION LOGIC ---
+            const accordionContainer = document.getElementById('accordion-container');
+            function renderAccordion() {
+                if (!accordionContainer) return;
+                accordionContainer.innerHTML = '';
+                accordionData.forEach(item => {
+                    accordionContainer.innerHTML += `
+                        <div class="border rounded-lg bg-white overflow-hidden">
+                           <button class="accordion-button w-full text-left p-4 font-semibold text-lg text-[#1D3557] hover:bg-gray-50">
+                               <span class="font-mono bg-gray-200 text-gray-800 px-2 py-1 rounded mr-2">${item.code}</span>
+                               ${item.title}
+                           </button>
+                           <div class="accordion-content">
+                               <p class="p-4 border-t text-gray-600">${item.content}</p>
+                           </div>
+                       </div>`;
+                });
+                
+                document.querySelectorAll('.accordion-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const content = button.nextElementSibling;
+                        button.classList.toggle('open');
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                        } else {
+                            content.style.maxHeight = content.scrollHeight + "px";
+                        }
+                    });
+                });
+            }
+
+
+            // Initial renders
+            renderTimeline();
+            renderAccordion();
+            console.log('✅ Portal Unificado carregado com sucesso!');
+        });
+    </script>
+</body>
 </html>
